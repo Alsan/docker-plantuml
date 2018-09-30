@@ -1,11 +1,21 @@
 #!/usr/bin/env bash
 
 __run_plantuml() {
-    local docker_image="miy4/plantuml"
+    local docker_image="alpine/plantuml:1.2018.11"
     local host_src_volume="${PWD}"
     local container_dest_volume="/work"
+    local uid=$(id -u)
+    local gid=$(id -g)
 
-    exec docker run --volume="${host_src_volume}:${container_dest_volume}" --workdir="${container_dest_volume}" --rm --attach=stdin --attach=stdout --interactive "${docker_image}" "$@"
+    exec docker run \
+	    --volume="${host_src_volume}:${container_dest_volume}" \
+	    --workdir="${container_dest_volume}" \
+	    --rm \
+	    --attach=stdin \
+	    --attach=stdout \
+	    --interactive \
+	    --user $uid:$gid \
+	    "${docker_image}" -tpng -charset utf-8 "$@"
 }
 
 __run_plantuml "$@"
